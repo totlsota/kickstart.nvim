@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -213,6 +213,23 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+local function get_venv_path()
+  local handle = io.popen 'poetry env info -e'
+  local result = handle:read '*a'
+  handle:close()
+  -- print('venv path:' .. result)
+  return result:gsub('\n', '')
+end
+
+local function get_extra_paths()
+  local handle = io.popen 'poetry env info -e'
+  local result = handle:read '*a'
+  handle:close()
+  local x = result:gsub('/bin/python', '/lib/python3.12/site-packages'):gsub('\n', '')
+  -- print('venv extra paths:' .. x)
+  return x
+end
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -221,7 +238,6 @@ vim.opt.rtp:prepend(lazypath)
 --  You can press `?` in this menu for help. Use `:q` to close the window
 --
 --  To update plugins you can run
---    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
@@ -239,7 +255,39 @@ require('lazy').setup({
 
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
-
+  -- tree view
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('nvim-tree').setup {}
+    end,
+  },
+  {
+    'Exafunction/codeium.nvim',
+    config = function()
+      -- Change '<C-g>' here to any keycode you like.
+      vim.keymap.set('i', '<C-g>', function()
+        return vim.fn['codeium#Accept']()
+      end, { expr = true, silent = true })
+      vim.keymap.set('i', '<c-;>', function()
+        return vim.fn['codeium#CycleCompletions'](1)
+      end, { expr = true, silent = true })
+      vim.keymap.set('i', '<c-,>', function()
+        return vim.fn['codeium#CycleCompletions'](-1)
+      end, { expr = true, silent = true })
+      vim.keymap.set('i', '<c-x>', function()
+        return vim.fn['codeium#Clear']()
+      end, { expr = true, silent = true })
+    end,
+    cmd = 'Codeium',
+    build = ':Codeium Auth',
+    opts = {},
+  },
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
   --    require('gitsigns').setup({ ... })
@@ -567,8 +615,21 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
+        pyright = {
+          settings = {
+            python = {
+              analysis = {
+                autoSearchPaths = false,
+                useLibraryCodeForTypes = true,
+                logLevel = 'Trace',
+                pythonPath = get_venv_path(),
+                extraPaths = { get_extra_paths() },
+                diagnosticMode = 'workspace',
+              },
+            },
+          },
+        },
+        rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
