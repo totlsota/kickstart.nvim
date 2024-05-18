@@ -185,10 +185,10 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -266,27 +266,6 @@ require('lazy').setup({
     config = function()
       require('nvim-tree').setup {}
     end,
-  },
-  {
-    'Exafunction/codeium.nvim',
-    config = function()
-      -- Change '<C-g>' here to any keycode you like.
-      vim.keymap.set('i', '<C-g>', function()
-        return vim.fn['codeium#Accept']()
-      end, { expr = true, silent = true })
-      vim.keymap.set('i', '<c-;>', function()
-        return vim.fn['codeium#CycleCompletions'](1)
-      end, { expr = true, silent = true })
-      vim.keymap.set('i', '<c-,>', function()
-        return vim.fn['codeium#CycleCompletions'](-1)
-      end, { expr = true, silent = true })
-      vim.keymap.set('i', '<c-x>', function()
-        return vim.fn['codeium#Clear']()
-      end, { expr = true, silent = true })
-    end,
-    cmd = 'Codeium',
-    build = ':Codeium Auth',
-    opts = {},
   },
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -620,16 +599,50 @@ require('lazy').setup({
             python = {
               analysis = {
                 autoSearchPaths = false,
+                autoImportCompletions = true,
                 useLibraryCodeForTypes = true,
-                logLevel = 'Trace',
                 pythonPath = get_venv_path(),
                 extraPaths = { get_extra_paths() },
                 diagnosticMode = 'workspace',
+                typeCheckingMode = 'none',
+                diagnosticSeverityOverrides = {
+                  reportPrivateUsage = 'none',
+                  reportMissingImports = true,
+                  reportMissingTypeStubs = 'none',
+                  reportMissingModuleSource = 'none',
+                  reportUnknownParameterType = 'none',
+                  reportUnknownVariableType = 'none',
+                  reportUnknownArgumentType = 'none',
+                  reportUnknownLambdaType = 'none',
+                  reportUnknownMemberType = 'none',
+                  reportGeneralTypeIssues = 'none',
+                  -- reportIncompatibleMethodOverride = 'none',
+                  -- reportUntypedFunctionDecorator = 'none',
+                  -- reportUntypedClassDecorator = 'none',
+                  -- reportUntypedBaseClass = 'none',
+                  -- reportCallInDefaultInitializer = 'none',
+                  -- reportOptionalSubscript = 'none',
+                  -- reportOptionalMemberAccess = 'none',
+                  -- reportOptionalCall = 'none',
+                  -- reportOptionalIterable = 'none',
+                  -- reportOptionalContextManager = 'none',
+                  -- reportOptionalOperand = 'none',
+                  -- reportTypedDictNotRequiredAccess = 'none',
+                  -- reportUntypedNamedTuple = 'none',
+                  -- reportAssertAlwaysTrue = 'none',
+                  -- reportSelfClsParameterName = 'none',
+                  -- reportImplicitStringConcatenation = 'none',
+                  -- reportUnusedCoroutine = 'none',
+                  -- reportUnusedVariable = 'none',
+                  -- reportUnusedImport = 'none',
+                  -- reportDuplicateImport = 'none',
+                },
               },
             },
           },
         },
         rust_analyzer = {},
+        ruff_lsp = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -794,9 +807,9 @@ require('lazy').setup({
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
+          -- ['<CR>'] = cmp.mapping.confirm { select = true },
+          -- ['<Tab>'] = cmp.mapping.select_next_item(),
+          ---['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -826,6 +839,7 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
+          { name = 'codeium' },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
@@ -890,6 +904,16 @@ require('lazy').setup({
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
+    end,
+  },
+  {
+    'Exafunction/codeium.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'hrsh7th/nvim-cmp',
+    },
+    config = function()
+      require('codeium').setup {}
     end,
   },
   { -- Highlight, edit, and navigate code
