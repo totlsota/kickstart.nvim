@@ -284,7 +284,11 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^4', -- Recommended
+    lazy = false, -- This plugin is already lazy
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -437,6 +441,11 @@ require('lazy').setup({
 
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
+    setup = {
+      rust_analyzer = function()
+        return true
+      end,
+    },
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
@@ -641,7 +650,19 @@ require('lazy').setup({
             },
           },
         },
-        rust_analyzer = {},
+        -- rust_analyzer = {
+        --   settings = {
+        --     -- to enable rust-analyzer settings visit:
+        --     -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
+        --     ['rust-analyzer'] = {
+        --       -- enable clippy on save
+        --       checkOnSave = {
+        --         command = 'clippy',
+        --       },
+        --     },
+        --   },
+        -- },
+        -- -- rust_tools = {},
         ruff_lsp = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
