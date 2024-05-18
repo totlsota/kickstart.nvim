@@ -284,11 +284,11 @@ require('lazy').setup({
       },
     },
   },
-  {
-    'mrcjkb/rustaceanvim',
-    version = '^4', -- Recommended
-    lazy = false, -- This plugin is already lazy
-  },
+  -- {
+  --   'mrcjkb/rustaceanvim',
+  --   version = '^4', -- Recommended
+  --   lazy = false, -- This plugin is already lazy
+  -- },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -650,6 +650,16 @@ require('lazy').setup({
             },
           },
         },
+        -- rustaceanvim = {
+        --   cmd = function()
+        --     local mason_registry = require 'mason-registry'
+        --     local ra_binary = mason_registry.is_installed 'rust-analyzer'
+        --         -- This may need to be tweaked, depending on the operating system.
+        --         and mason_registry.get_package('rust-analyzer'):get_install_path() .. '/rust-analyzer'
+        --       or 'rust-analyzer'
+        --     return { ra_binary } -- You can add args to the list, such as '--log-file'
+        --   end,
+        -- },
         -- rust_analyzer = {
         --   settings = {
         --     -- to enable rust-analyzer settings visit:
