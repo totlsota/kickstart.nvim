@@ -750,26 +750,47 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        return {
-          timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
-        }
-      end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        python = { 'black' },
+        rust = { 'rustfmt' },
       },
+      format_on_save = function(bufnr)
+        -- Disable formatting on save for Python files
+        if vim.bo[bufnr].filetype == 'python' then
+          return false
+        end
+        -- Enable for all other files
+        return {
+          timeout_ms = 500,
+          lsp_fallback = true,
+          async = false,
+          quiet = false,
+        }
+      end,
     },
+    -- opts = {
+    --   notify_on_error = false,
+    --   format_on_save = function(bufnr)
+    --     -- Disable "format_on_save lsp_fallback" for languages that don't
+    --     -- have a well standardized coding style. You can add additional
+    --     -- languages here or re-enable it for the disabled ones.
+    --     local disable_filetypes = { c = true, cpp = true }
+    --     return {
+    --       timeout_ms = 500,
+    --       lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+    --     }
+    --   end,
+    --   formatters_by_ft = {
+    --     lua = { 'stylua' },
+    --     -- Conform can also run multiple formatters sequentially
+    --     -- python = { "isort", "black" },
+    --     --
+    --     -- You can use a sub-list to tell conform to run *until* a formatter
+    --     -- is found.
+    --     -- javascript = { { "prettierd", "prettier" } },
+    --   },
+    -- },
   },
 
   { -- Autocompletion
